@@ -244,7 +244,7 @@ exports.uploadPhoto = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const fileUrl = `http://localhost:3000/uploads/${req.file.filename}`;
+const fileUrl = `https://backendv-4q6s.onrender.com/uploads/${req.file.filename}`;
 
     await prisma.usuarios.update({
       where: { id_usuario: BigInt(userId) },
