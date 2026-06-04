@@ -14,8 +14,7 @@ RUN npm ci
 COPY . .
 
 # Generar cliente Prisma
-RUN npx prisma generate
-
+RUN DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder" npx prisma generate
 # Stage 3: Production
 FROM node:20-alpine
 WORKDIR /app
