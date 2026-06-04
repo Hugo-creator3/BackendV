@@ -136,6 +136,8 @@ exports.login = async (req, res) => {
 exports.enviarCodigoRegistro = async (req, res) => {
 
   try {
+        console.log("BODY:", req.body)
+
 
     const {
       email
@@ -144,6 +146,8 @@ exports.enviarCodigoRegistro = async (req, res) => {
     const existe = await prisma.admins.findUnique({
       where: { email }
     })
+        console.log("EMAIL VALIDADO")
+
 
     if (existe) {
       return res.status(400).json({
@@ -155,9 +159,15 @@ exports.enviarCodigoRegistro = async (req, res) => {
       100000 + Math.random() * 900000
     ).toString()
 
+        console.log("CODIGO:", codigo)
+
+
     const expiracion = new Date(
       Date.now() + 10 * 60 * 1000
     )
+
+        console.log("CODIGO GUARDADO")
+
 
     await prisma.codigos_verificacion.create({
       data: {
@@ -175,7 +185,7 @@ exports.enviarCodigoRegistro = async (req, res) => {
 
   } catch (error) {
 
-    console.error(error)
+    console.error("ERROR SEND CODE:", error)
 
     res.status(500).json({
       error: error.message
