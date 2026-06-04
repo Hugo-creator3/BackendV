@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model instituciones {
+  id_institucion   BigInt     @id @default(autoincrement())
+  nombre           String
+  razon_social     String?
+  rfc              String?
+  clave_segura     String     @unique
+  tipo_institucion String?
+  activo           Boolean    @default(true)
+  admins           admins[]
+  usuarios         usuarios[]
+
+  tarjeta_diseno         tarjeta_diseno?
+  geolocalizacion_config geolocalizacion_config?
+  asistencias            asistencias[]
+  configuracion_empresa  configuracion_empresa?
+  historial_consultas    historial_consultas[]
+}
+
+model admins {
+  id_admin       BigInt   @id @default(autoincrement())
+  email          String   @unique
+  nombre         String
+  password_hash  String
+  cargo          String?
+  fecha_creacion DateTime @default(now())
+  activo         Boolean  @default(true)
+
+  id_institucion BigInt
+  institucion    instituciones @relation(fields: [id_institucion], references: [id_institucion])
+}
+
+model tarjeta_diseno {
+  id_diseno BigInt @id @default(autoincrement())
+
+  nombre_institucion String
+  logo_url           String?
+
+  color_primario   String?
+  color_secundario String?
+  color_terciario  String?
+  color_cuarto     String?
+
+  layout String @default("horizontal")
+
+  id_institucion BigInt @unique
+
+  institucion instituciones @relation(fields: [id_institucion], references: [id_institucion])
+}
+
+model usuarios {
+  id_usuario       BigInt        @id @default(autoincrement())
+  nombre           String
+  apellidos        String
+  email            String        @unique
+  password_hash    String
+  telefono         String?
+  genero           String?
+  fecha_nacimiento DateTime?
+  foto_url         String?
+  id_institucion   BigInt
+  institucion      instituciones @relation(fields: [id_institucion], references: [id_institucion])
+
+  fecha_creacion DateTime         @default(now())
+  activo         Boolean          @default(true)
+  asistencias    asistencias[]
+  notificaciones notificaciones[]
+}
+
+model geolocalizacion_config {
+  id_config       BigInt   @id @default(autoincrement())
+  latitud         Float
+  longitud        Float
+  radio_metros    Int      @default(100)
+
+  bloqueo_intentos Boolean  @default(true)
+  bloqueo_horario  Boolean  @default(true)
+
+  id_institucion  BigInt   @unique
+
+  institucion     instituciones @relation(fields: [id_institucion], references: [id_institucion])
+
+  fecha_actualizacion DateTime @updatedAt
+}
+model asistencias {
+  id_asistencia BigInt @id @default(autoincrement())
+
+  fecha_hora DateTime @default(now())
+
+  latitud  Float
+  longitud Float
+
+  estado String
+
+  minutos_retraso Int? @default(0)
+
+  id_usuario BigInt
+  usuario    usuarios @relation(fields: [id_usuario], references: [id_usuario])
+
+  id_institucion BigInt
+  institucion    instituciones @relation(fields: [id_institucion], references: [id_institucion])
+}
+
+model notificaciones {
+  id_notificacion BigInt   @id @default(autoincrement())
+  tipo            String
+  mensaje         String
+  id_usuario      BigInt
+  id_institucion  BigInt
+  fecha_creacion  DateTime @default(now())
+
+  usuario usuarios @relation(fields: [id_usuario], references: [id_usuario])
+}
+
+model codigos_verificacion {
+  id        BigInt   @id @default(autoincrement())
+  email     String
+  codigo    String
+  expira_en DateTime
+  usado     Boolean  @default(false)
+
+  fecha_creacion DateTime @default(now())
+}
+
+model configuracion_empresa {
+  id_configuracion BigInt @id @default(autoincrement())
+
+  hora_entrada String
+  hora_salida  String
+
+  tolerancia_minutos Int @default(10)
+
+  max_usuarios Int @default(10)
+  
+  checkin_habilitado  Boolean @default(true)
+
+  codigo_empresa String?
+
+  id_institucion BigInt        @unique
+  institucion    instituciones @relation(fields: [id_institucion], references: [id_institucion])
+
+  fecha_actualizacion DateTime @updatedAt
+}
+
+model historial_consultas {
+  id_historial   BigInt   @id @default(autoincrement())
+  id_institucion BigInt
+  id_admin       BigInt?
+  pregunta       String   @db.Text
+  consulta_sql   String?  @db.Text
+  respuesta      String   @db.Text
+  estado         String   @default("OK")
+  error          String?  @db.Text
+  fecha_creacion DateTime @default(now())
+
+  institucion instituciones @relation(fields: [id_institucion], references: [id_institucion], onDelete: Cascade)
+
+  @@index([id_institucion])
+}

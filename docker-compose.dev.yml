@@ -1,0 +1,66 @@
+# Docker Compose para desarrollo local con hot reload
+# Usar con: docker-compose -f docker-compose.dev.yml up -d
+
+version: '3.8'
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: backendv1_db_dev
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-backendv1_db}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+      - "5555:5555"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-backendv1_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network-dev
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backendv1_app_dev
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-backendv1_db}
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-key}
+      JWT_EXPIRE: ${JWT_EXPIRE:-7d}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000,http://localhost:5173}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM: ${SMTP_FROM}
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+      - /app/node_modules
+    networks:
+      - app-network-dev
+    restart: unless-stopped
+    command: >
+      sh -c "npm run dev"
+
+volumes:
+  postgres_data_dev:
+    driver: local
+
+networks:
+  app-network-dev:
+    driver: bridge
