@@ -1,22 +1,21 @@
-const nodemailer = require('nodemailer')
+const { Resend } = require('resend')
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  secure: false,
-    family: 4,
+const resend = new Resend(
+  process.env.RESEND_API_KEY
+)
 
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-})
+const enviarCodigo = async (
+  email,
+  codigo
+) => {
 
-const enviarCodigo = async (email, codigo) => {
+  await resend.emails.send({
+    from: 'onboarding@resend.dev',
 
-  await transporter.sendMail({
-    from: `"VirtualID" <${process.env.EMAIL_USER}>`,
     to: email,
+
     subject: 'Código de verificación',
+
     html: `
       <div style="font-family:Arial;padding:20px">
         <h2>Verificación de cuenta</h2>
@@ -30,10 +29,13 @@ const enviarCodigo = async (email, codigo) => {
           ${codigo}
         </h1>
 
-        <p>Este código expira en 10 minutos.</p>
+        <p>
+          Este código expira en 10 minutos.
+        </p>
       </div>
     `
   })
+  console.log(response)
 
 }
 
