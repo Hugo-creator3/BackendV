@@ -21,14 +21,8 @@ const reportesRoutes = require('./routes/reportes.routes');
 const PORT = process.env.APP_PORT || 3000
 const NODE_ENV = process.env.NODE_ENV || 'development'
 
-app.use(cors({
-  origin: [
-    'http://localhost:4200',
-    'http://localhost:5173',
-    'https://TU-FRONTEND.onrender.com'
-  ],
-  credentials: true
-}))
+app.use(cors())
+app.options('*', cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
