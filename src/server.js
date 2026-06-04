@@ -21,8 +21,10 @@ const reportesRoutes = require('./routes/reportes.routes');
 const PORT = process.env.APP_PORT || 3000
 const NODE_ENV = process.env.NODE_ENV || 'development'
 
-app.use(cors())
-app.options('*', cors())
+app.use(cors({
+  origin: true,
+  credentials: true
+}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
