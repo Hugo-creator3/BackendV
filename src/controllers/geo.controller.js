@@ -50,14 +50,15 @@ exports.saveConfig = async (req, res) => {
          }
       })
     } else {
+      console.log("TENANT:", req.tenantId)
+console.log("BODY:", req.body)
       result = await prisma.geolocalizacion_config.create({
         data: {
            latitud,
            longitud,
            radio_metros: radio,
            bloqueo_intentos,
-           bloqueo_horario,
-           id_institucion: BigInt(req.tenantId)
+           bloqueo_horario
         }
 })
     }

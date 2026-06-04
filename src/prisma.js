@@ -119,6 +119,9 @@ geolocalizacion_config: {
 create: async ({ args, query }) => {
   const tenantId = tenantContext.getTenantId()
 
+  console.log("TENANT CONTEXT:", tenantId)
+  console.log("ARGS CREATE:", JSON.stringify(args, null, 2))
+
   if (tenantId) {
     args.data = {
       ...args.data,
