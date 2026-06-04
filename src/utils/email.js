@@ -35,7 +35,6 @@ const enviarCodigo = async (
       </div>
     `
   })
-  console.log(response)
 
 }
 
