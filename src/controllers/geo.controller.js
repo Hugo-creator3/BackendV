@@ -2,8 +2,8 @@ const prisma = require('../prisma')
 const axios = require("axios");
 const serializeBigInt = require('../utils/bigintSerializer')
 
-const ANOMALY_API_URL = process.env.ANOMALY_API_URL || "https://virtualid-anomal-as.onrender.com";
-const ANOMALY_API_KEY = process.env.MY_SECRET_API_MAXIMILIAN_ADAREX;
+const ANOMALY_API_URL = process.env.ANOMALY_API_URL;
+const ANOMALY_API_KEY = process.env.ANOMALY_API_KEY;
 
 function notificarAnomalia(idAsistencia) {
 
