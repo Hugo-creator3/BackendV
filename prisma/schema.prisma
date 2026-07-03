@@ -167,7 +167,6 @@ model historial_consultas {
 
   @@index([id_institucion])
 }
-
 model anomalias_detectadas {
   id_anomalia     BigInt   @id @default(autoincrement())
   id_asistencia   BigInt   @unique
@@ -176,6 +175,7 @@ model anomalias_detectadas {
   es_anomalia     Boolean
   score           Float
   tipo_probable   String?
+  explicacion     String?  @db.Text
   fecha_deteccion DateTime @default(now())
 
   usuario     usuarios      @relation(fields: [id_usuario], references: [id_usuario])

@@ -36,6 +36,7 @@ exports.getAnomalias = async (req, res) => {
       id_asistencia: a.id_asistencia,
       score: a.score,
       tipo_probable: a.tipo_probable,
+      explicacion: a.explicacion,
       fecha_deteccion: a.fecha_deteccion,
       usuario: {
         id_usuario: a.usuario.id_usuario,
