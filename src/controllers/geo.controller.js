@@ -6,8 +6,10 @@ const ANOMALY_API_URL = process.env.ANOMALY_API_URL;
 const ANOMALY_API_KEY = process.env.ANOMALY_API_KEY;
 
 function notificarAnomalia(idAsistencia) {
-
+console.log("URL de la API siendo usada:", process.env.ANOMALY_API_URL);
+console.log("Longitud de la URL:", process.env.ANOMALY_API_URL?.length);
   axios.post(
+    
     `${ANOMALY_API_URL}/predict/${idAsistencia}`,
     {},
     {
