@@ -14,6 +14,7 @@ const geoRoutes = require('./routes/geo.routes')
 const asistenciasRoutes = require('./routes/asistencias.routes');
 const notificacionesRoutes = require('./routes/notificaciones.routes');
 const reportesRoutes = require('./routes/reportes.routes');
+ const anomaliasRouter = require('./routes/anomalias.routes');
 
 
 
@@ -59,6 +60,8 @@ app.use('/api/auth', authRoutes)
 app.use('/api/panel', panelRoutes)
 app.use('/api/configuracion', require('./routes/configuracion.routes'));
 app.use('/api/tarjeta', tarjetaRoutes)
+app.use('/api/anomalias', anomaliasRouter);
+
 
 // Ruta 404
 app.use((req, res) => {
