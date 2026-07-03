@@ -23,6 +23,7 @@ model instituciones {
   asistencias            asistencias[]
   configuracion_empresa  configuracion_empresa?
   historial_consultas    historial_consultas[]
+  anomalias_detectadas   anomalias_detectadas[]
 }
 
 model admins {
@@ -73,6 +74,7 @@ model usuarios {
   activo         Boolean          @default(true)
   asistencias    asistencias[]
   notificaciones notificaciones[]
+  anomalias_detectadas   anomalias_detectadas[]
 }
 
 model geolocalizacion_config {
@@ -164,4 +166,20 @@ model historial_consultas {
   institucion instituciones @relation(fields: [id_institucion], references: [id_institucion], onDelete: Cascade)
 
   @@index([id_institucion])
+}
+
+model anomalias_detectadas {
+  id_anomalia     BigInt   @id @default(autoincrement())
+  id_asistencia   BigInt   @unique
+  id_usuario      BigInt
+  id_institucion  BigInt
+  es_anomalia     Boolean
+  score           Float
+  tipo_probable   String?
+  fecha_deteccion DateTime @default(now())
+
+  usuario     usuarios      @relation(fields: [id_usuario], references: [id_usuario])
+  institucion instituciones @relation(fields: [id_institucion], references: [id_institucion])
+
+  @@index([id_institucion, fecha_deteccion])
 }

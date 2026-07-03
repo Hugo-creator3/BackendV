@@ -1,6 +1,31 @@
 const prisma = require('../prisma')
+const axios = require("axios");
 const serializeBigInt = require('../utils/bigintSerializer')
 
+const ANOMALY_API_URL = process.env.ANOMALY_API_URL || "https://virtualid-anomal-as.onrender.com";
+const ANOMALY_API_KEY = process.env.MY_SECRET_API_MAXIMILIAN_ADAREX;
+
+function notificarAnomalia(idAsistencia) {
+
+  axios.post(
+    `${ANOMALY_API_URL}/predict/${idAsistencia}`,
+    {},
+    {
+      headers: {
+        "X-API-Key": ANOMALY_API_KEY
+      },
+      timeout: 90000
+    }
+  ).catch(err => {
+
+    console.error(
+      "Error llamando API de anomalías:",
+      err.message
+    );
+
+  });
+
+}
 // OBTENER CONFIG
 exports.getConfig = async (req, res) => {
   try {
@@ -285,23 +310,26 @@ if (checkinHoy) {
     // ==========================
     // GUARDAR ASISTENCIA
     // ==========================
-    await prisma.asistencias.create({
-      data: {
-        latitud,
-        longitud,
-        estado,
-        minutos_retraso:
-          estado === "RETRASO"
-            ? minutosTarde
-            : 0,
-        id_usuario: BigInt(
-          req.user.id
-        ),
-        id_institucion: BigInt(
-          req.tenantId
-        )
-      }
-    });
+    const asistencia = await prisma.asistencias.create({
+
+  data: {
+
+    latitud,
+    longitud,
+    estado,
+
+    minutos_retraso:
+      estado === "RETRASO"
+        ? minutosTarde
+        : 0,
+
+    id_usuario: BigInt(req.user.id),
+
+    id_institucion: BigInt(req.tenantId)
+
+  }
+
+});
 
     // ==========================
     // NOTIFICACIÓN POR 3 FALLOS
@@ -376,23 +404,29 @@ if (checkinHoy) {
     // ==========================
     // RESPUESTA
     // ==========================
-    if (dentro) {
-      return res.json({
+   if (dentro) {
+
+    res.json({
         success: true,
         message:
-          estado === "RETRASO"
-            ? `Llegó ${minutosTarde} minutos tarde`
-            : "Dentro del área",
+            estado === "RETRASO"
+                ? `Llegó ${minutosTarde} minutos tarde`
+                : "Dentro del área",
         distancia
-      });
-    }
-
-    return res.status(403).json({
-      success: false,
-      message:
-        "Fuera del área permitida",
-      distancia
     });
+
+    notificarAnomalia(Number(asistencia.id_asistencia));
+
+    return;
+}
+
+res.status(403).json({
+    success: false,
+    message: "Fuera del área permitida",
+    distancia
+});
+
+notificarAnomalia(Number(asistencia.id_asistencia));
 
   } catch (error) {
     console.error(error);
